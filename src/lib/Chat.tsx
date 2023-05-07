@@ -37,6 +37,7 @@ export const Chat = () => {
       content: `You are a model that generates playlist for users based on their requests
       ONLY reply in the following format in ndjson:
       {key: "messageToUser", value: string}
+      {key: "playlistName", value: string}
       {key: "song", value: string}`,
     },
   ])
@@ -74,6 +75,7 @@ export const Chat = () => {
     let updateId = 0
     let strBuffer = ''
     let fullMessage = ''
+    let playlistName = ''
     let messageToUser = ''
     const songs: string[] = []
 
@@ -94,7 +96,21 @@ export const Chat = () => {
               .filter(Boolean)
 
             const checkBuffer = (str: string) => {
+              console.log('checkBuffer', {
+                str,
+              })
+
               try {
+                if (str.includes('\n')) {
+                  const splits = str.split('\n')
+
+                  for (const split of splits) {
+                    checkBuffer(split)
+                  }
+
+                  return
+                }
+
                 const lineJson = JSON.parse(str) as {
                   key: string
                   value: string
@@ -133,8 +149,13 @@ export const Chat = () => {
                   ])
 
                   strBuffer = ''
+                } else if (lineJson.key === 'playlistName') {
+                  playlistName = lineJson.value
+
+                  strBuffer = ''
                 }
               } catch (e) {
+                console.warn('Error parsing JSON', e)
                 // console.log(e)
               }
             }
@@ -190,55 +211,8 @@ export const Chat = () => {
     setMessages([...messages, { role: 'assistant', content: fullMessage }])
 
     getSongInfo()
-    // const completion = await openai.createChatCompletion(
-    //   {
-    //     messages: newMessages,
-    //     model: 'gpt-3.5-turbo',
-    //     stream: true,
-    //   },
-    //   { responseType: 'stream' }
-    // )
 
-    // if (reason === 'stop') {
-    //   const message = completion.data.choices[0]?.message
-
-    //   if (message) {
-    //     const content = message.content
-
-    //     const lines = content.split('\n')
-
-    //     let messageToUser = ''
-    //     const songs: string[] = []
-
-    //     for (const line of lines) {
-    //       if (line.includes('{')) {
-    //         const json = JSON.parse(line) as { key: string; value: string }
-    //         if (json.key === 'messageToUser') {
-    //           messageToUser = json.value
-    //         } else if (json.key === 'song') {
-    //           songs.push(json.value)
-    //         }
-    //       }
-    //     }
-
-    //     console.log({ messageToUser, songs })
-
-    //     if (messageToUser && songs) {
-    //       setDisplayMessage([
-    //         ...displayMessage,
-    //         {
-    //           role: 'assistant',
-    //           content: `${messageToUser}\n${songs.join(', \n')}`,
-    //         },
-    //       ])
-
-    //       setMessages([...messages, message])
-    //     }
-
-    //     useStore.getState().setSongNames(songs)
-    //     setCurrentMessage('')
-    //   }
-    // }
+    useStore.getState().setPlaylistName(playlistName)
   }
 
   const hasKey = useStore((state) => !!state.openAIKey)
@@ -246,45 +220,48 @@ export const Chat = () => {
   if (!hasKey) return <></>
 
   return (
-    <div className="relative mt-2 flex h-full w-full flex-1 flex-col justify-end border-t border-slate-700/60">
-      {/* <div className="h-full w-full flex-1"></div> */}
-      <div className="flex h-full w-full flex-col space-y-1 overflow-y-auto px-8 py-4 text-slate-300">
-        {displayMessage.map((message, i) => {
-          return (
-            <div
-              key={`message-${i}`}
-              className={clsx(
-                'flex w-full',
-                message.role === 'user' ? 'justify-start' : 'justify-end'
-              )}
-            >
-              <p>{message.content}</p>
-            </div>
-          )
-        })}
-      </div>
-      <form
-        onSubmit={(e) => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          toast.promise(onSubmit(e), {
-            error: (err) => {
-              console.error(err)
+    <div className="flex flex-1 flex-col pt-12">
+      <div className="relative flex h-full max-h-[55vh] w-full flex-col border-t border-slate-700/60">
+        <div className="flex h-full w-full flex-1 flex-col space-y-1 overflow-y-auto px-8 py-4 text-slate-300">
+          {displayMessage.map((message, i) => {
+            return (
+              <div
+                key={`message-${i}`}
+                className={clsx(
+                  'flex w-full',
+                  message.role === 'user'
+                    ? 'text-indigo-100'
+                    : 'text-fuchsia-300'
+                )}
+              >
+                <p>{message.content}</p>
+              </div>
+            )
+          })}
+        </div>
+        <form
+          onSubmit={(e) => {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            toast.promise(onSubmit(e), {
+              error: (err) => {
+                console.error(err)
 
-              return 'Error fetching data'
-            },
-            loading: 'Generating playlist ...',
-            success: 'Playlist generated!',
-          })
-        }}
-        className="place-items-end bg-slate-800 py-2"
-      >
-        <input
-          value={currentMessage}
-          onChange={(e) => setCurrentMessage(e.target.value)}
-          placeholder="Send a message"
-          className="h-full w-full resize-none border-transparent bg-transparent px-8 text-slate-300 outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 active:outline-none"
-        ></input>
-      </form>
+                return 'Error fetching data'
+              },
+              loading: 'Generating playlist ...',
+              success: 'Playlist generated!',
+            })
+          }}
+          className="place-items-end bg-slate-800 py-2"
+        >
+          <input
+            value={currentMessage}
+            onChange={(e) => setCurrentMessage(e.target.value)}
+            placeholder="Send a message"
+            className="h-full w-full resize-none border-transparent bg-transparent px-8 text-slate-300 outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 active:outline-none"
+          ></input>
+        </form>
+      </div>
     </div>
   )
 }

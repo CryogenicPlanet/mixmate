@@ -7,6 +7,7 @@ import { Configuration, OpenAIApi } from 'openai'
 
 import SpotifyWebApi from 'spotify-web-api-js'
 import { apiClient } from '~/utils/api'
+import { env } from '~/env.mjs'
 
 const spotifyApi = new SpotifyWebApi()
 
@@ -91,6 +92,8 @@ type Store = {
     access: string
     refresh: string
   }
+  playlistName: string
+  setPlaylistName: (name: string) => void
   setSpotifyToken: (token: { access: string; refresh: string }) => void
   openAI: OpenAIApi | null
   setOpenAIKey: (key: string) => void
@@ -105,10 +108,14 @@ type Store = {
 }
 
 export const useStore = create<Store>((set) => ({
-  openAIKey: '',
+  openAIKey: env.NEXT_PUBLIC_DANGEROUS_OPENAI_API_KEY,
   spotifyToken: {
     access: '',
     refresh: '',
+  },
+  playlistName: '',
+  setPlaylistName: (name: string) => {
+    set({ playlistName: name })
   },
   setSpotifyToken: (token: { access: string; refresh: string }) => {
     set({ spotifyToken: token })

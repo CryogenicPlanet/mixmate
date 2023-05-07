@@ -26,6 +26,8 @@ const handler = (_req: NextApiRequest, res: NextApiResponse) => {
       'user-modify-playback-state',
       'user-library-read',
       'user-library-modify',
+      'playlist-modify-public',
+      'playlist-modify-private',
     ],
     'state'
   )
