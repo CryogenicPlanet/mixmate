@@ -17,6 +17,7 @@ import SpotifyPlayer from 'react-spotify-web-playback'
 import colors from 'tailwindcss/colors'
 import { api } from '~/utils/api'
 import toast from 'react-hot-toast'
+import { env } from '~/env.mjs'
 
 function PlayPauseIcon({
   playing,
@@ -101,6 +102,8 @@ export default function Home() {
 
     if (openAIKey) {
       useStore.getState().setOpenAIKey(openAIKey)
+    } else {
+      useStore.getState().setOpenAIKey(env.NEXT_PUBLIC_DANGEROUS_OPENAI_API_KEY)
     }
 
     if (spotifyAccessToken && spotifyRefreshToken) {

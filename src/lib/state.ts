@@ -108,7 +108,7 @@ type Store = {
 }
 
 export const useStore = create<Store>((set) => ({
-  openAIKey: env.NEXT_PUBLIC_DANGEROUS_OPENAI_API_KEY,
+  openAIKey: '',
   spotifyToken: {
     access: '',
     refresh: '',
