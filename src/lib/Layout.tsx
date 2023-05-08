@@ -4,6 +4,10 @@ import Link from 'next/link'
 
 import posterImage from '~/image/playlist.png'
 import { Chat } from './Chat'
+import { useStore } from './state'
+import SpotifyPlayer from 'react-spotify-web-playback'
+import colors from 'tailwindcss/colors'
+import clsx from 'clsx'
 
 function randomBetween(min: number, max: number, seed = 1) {
   return () => {
@@ -75,10 +79,14 @@ function Waveform(props: JSX.IntrinsicElements['svg']) {
 export function Layout({ children }: React.PropsWithChildren) {
   const hosts = ['Scalar']
 
+  const currentSong = useStore((state) => state.currentSong)
+
+  const songs = useStore((state) => state.songs)
+
   return (
-    <div className="grid h-full max-h-screen min-h-screen grid-cols-12 overflow-hidden bg-slate-900">
-      <header className="col-span-3 grid grid-cols-12 bg-slate-900">
-        <div className="col-span-1 lg:sticky lg:top-0 lg:flex lg:w-16 lg:flex-none lg:items-center lg:whitespace-nowrap lg:py-12 lg:text-sm lg:leading-7 lg:[writing-mode:vertical-rl]">
+    <div className="flex h-full max-h-screen min-h-screen grid-cols-12 flex-col overflow-hidden bg-slate-900 sm:grid">
+      <div className="col-span-3 grid flex-1 grid-cols-12 bg-slate-900">
+        <div className="col-span-1 hidden sm:block lg:sticky lg:top-0 lg:flex lg:w-16 lg:flex-none lg:items-center lg:whitespace-nowrap lg:py-12 lg:text-sm lg:leading-7 lg:[writing-mode:vertical-rl]">
           <span className="font-mono text-slate-500">Build by</span>
           <span className="mt-6 flex gap-6 font-bold text-slate-300">
             {hosts.map((host, hostIndex) => (
@@ -93,36 +101,72 @@ export function Layout({ children }: React.PropsWithChildren) {
             ))}
           </span>
         </div>
-        <div className="relative z-10 col-span-11 mx-auto flex h-full max-h-screen flex-col pt-10 md:max-w-2xl lg:min-h-full lg:flex-auto lg:border-x lg:border-slate-800/70 lg:pt-12">
-          <div className="px-12">
-            <Link
-              href="/"
-              className="relative mx-auto block w-48 overflow-hidden rounded-lg bg-slate-200 shadow-xl sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
-              aria-label="Homepage"
-            >
-              <Image
-                className="w-full"
-                src={posterImage}
-                alt=""
-                sizes="(min-width: 1024px) 20rem, (min-width: 640px) 16rem, 12rem"
-                priority
-              />
-              <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/10 sm:rounded-xl lg:rounded-2xl" />
-            </Link>
+        <div className="relative z-10 col-span-12 mx-auto flex h-full max-h-screen w-full flex-col pt-10 sm:col-span-11 sm:max-w-2xl lg:min-h-full lg:flex-auto lg:border-x lg:border-slate-800/70 lg:pt-12">
+          <div className="flex w-full flex-col">
+            <div className="px-12">
+              <Link
+                href="/"
+                className="relative mx-auto block w-12 overflow-hidden rounded-lg bg-slate-200 shadow-xl sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
+                aria-label="Homepage"
+              >
+                <Image
+                  className="w-full"
+                  src={posterImage}
+                  alt=""
+                  sizes="(min-width: 1024px) 20rem, (min-width: 640px) 16rem, 12rem"
+                  priority
+                />
+                <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/10 sm:rounded-xl lg:rounded-2xl" />
+              </Link>
+            </div>
+            <div className="mt-2 px-8 text-center sm:mt-10 lg:mt-12 lg:text-left">
+              <p className="text-xl font-bold text-slate-300">
+                <Link href="/">Mixmate</Link>
+              </p>
+              {!currentSong && (
+                <p className="mt-3 text-lg font-medium leading-8 text-slate-400">
+                  Talk to GPT and get a mixtape back
+                </p>
+              )}
+            </div>
+            <div className="flex max-h-[15vh] overflow-y-scroll sm:hidden">
+              {currentSong && (
+                <SpotifyPlayer
+                  token={useStore.getState().spotifyToken.access}
+                  uris={[currentSong.uri]}
+                  initialVolume={0.5}
+                  hideCoverArt={true}
+                  hideAttribution={true}
+                  callback={(state) => console.log(state)}
+                  styles={{
+                    activeColor: '#fff',
+                    bgColor: colors.slate[900],
+                    color: '#fff',
+                    loaderColor: '#fff',
+                    sliderColor: '#1cb954',
+                    trackArtistColor: '#ccc',
+                    trackNameColor: '#fff',
+                    sliderHandleColor: colors.green[500],
+                  }}
+                />
+              )}
+            </div>
           </div>
-          <div className="mt-10 px-8 text-center lg:mt-12 lg:text-left">
-            <p className="text-xl font-bold text-slate-300">
-              <Link href="/">Mixmate</Link>
-            </p>
-            <p className="mt-3 text-lg font-medium leading-8 text-slate-400">
-              Talk to GPT and get a mixtape back
-            </p>
+          <div
+            className={clsx(
+              'mt-2 flex flex-col sm:hidden',
+              songs.length > 0 ? 'border-t border-slate-600/30' : ''
+            )}
+          >
+            {children}
           </div>
-          <Chat></Chat>
+          <div className="flex flex-1 pb-2">
+            <Chat></Chat>
+          </div>
         </div>
-      </header>
-      <main className="relative col-span-9 flex h-full flex-col">
-        <Waveform className="absolute left-0 top-0 h-20 w-full -translate-x-3" />
+      </div>
+      <main className="relative col-span-9 hidden h-full flex-col sm:flex">
+        <Waveform className="absolute left-0 top-0 hidden h-20 w-full -translate-x-3 sm:block" />
         <div className="relative h-full">{children}</div>
       </main>
     </div>

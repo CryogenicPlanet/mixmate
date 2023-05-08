@@ -9,15 +9,15 @@ import {
   SPOTIFY_ACCESS_TOKEN_LOCAL_STORAGE_KEY,
   SPOTIFY_REFRESH_TOKEN_LOCAL_STORAGE_KEY,
 } from '~/lib/state'
+import Link from 'next/link'
 
 import clsx from 'clsx'
 import { useRouter } from 'next/router'
 
 import SpotifyPlayer from 'react-spotify-web-playback'
 import colors from 'tailwindcss/colors'
-import { api } from '~/utils/api'
-import toast from 'react-hot-toast'
 import { env } from '~/env.mjs'
+import { CreatePlaylist } from '~/lib/CreatePlaylist'
 
 function PlayPauseIcon({
   playing,
@@ -44,17 +44,21 @@ function SongElement({ song }: { song: Song }) {
       <div className={clsx('lg:px-8')}>
         <div className="lg:max-w-4xl">
           <div className="mx-auto px-2 sm:px-2 md:max-w-2xl md:px-2 lg:px-0">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center justify-center">
+            <div className="flex flex-col items-center space-x-2 sm:flex-row">
+              <div className="flex flex-col items-center justify-center sm:flex-row">
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
-                <img src={song.image} alt="Album Art" className="h-36 w-auto" />
+                <img
+                  src={song.image}
+                  alt="Album Art"
+                  className="h-auto w-20 sm:w-36"
+                />
               </div>
               <div className="flex flex-col items-start px-4">
-                <h2 className="mt-2 text-lg font-bold text-slate-200">
+                <h2 className="mt-2 text-sm font-semibold text-slate-200 sm:text-lg sm:font-bold">
                   <p>{song.title}</p>
                 </h2>
 
-                <p className="mt-1 text-base leading-7 text-slate-400">
+                <p className="mt-1 text-xs leading-7 text-slate-400 sm:text-base">
                   {song.artist}
                 </p>
                 <div className="mt-4 flex items-center gap-4">
@@ -152,8 +156,6 @@ export default function Home() {
 
   const currentSong = useStore((state) => state.currentSong)
 
-  const { mutateAsync } = api.spotify.createPlaylist.useMutation({})
-
   return (
     <Layout>
       <Head>
@@ -163,10 +165,10 @@ export default function Home() {
           content="Mixmate is a tool to help you create playlists with chatgpt."
         />
       </Head>
-      <div className="h-full pt-18">
+      <div className="h-full pt-1 sm:pt-18">
         {hasSpotifyAccess ? (
           <>
-            <div className={'lg:px-8'}>
+            <div className={'hidden sm:block lg:px-8'}>
               <div className="lg:max-w-4xl">
                 <div className="mx-auto px-4 sm:px-6 md:max-w-2xl md:px-4 lg:px-0">
                   <h1 className="text-2xl font-bold leading-7 text-slate-900">
@@ -176,13 +178,13 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex h-full max-h-[90vh] flex-col justify-end">
-              <div className="grid flex-1 grid-cols-2 divide-x divide-slate-500/10 overflow-scroll py-8">
+            <div className="flex h-full max-h-[40vh] flex-col justify-end sm:max-h-[90vh]">
+              <div className="grid flex-1  grid-cols-2 divide-x divide-slate-500/10 overflow-scroll py-8">
                 {songs.map((song) => (
                   <SongElement key={song.uri} song={song} />
                 ))}
               </div>
-              <div className="grid w-full grid-cols-12">
+              <div className="hidden w-full grid-cols-12 sm:grid">
                 <div className="col-span-10">
                   {currentSong && (
                     <SpotifyPlayer
@@ -203,56 +205,21 @@ export default function Home() {
                     />
                   )}
                 </div>
-                <div className="col-span-2 flex items-center justify-end px-4">
-                  <button
-                    onClick={() => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                      toast.promise(
-                        mutateAsync({
-                          access: useStore.getState().spotifyToken.access,
-                          refresh: useStore.getState().spotifyToken.refresh,
-                          name: useStore.getState().playlistName,
-                          songs: useStore
-                            .getState()
-                            .songs.map((song) => song.uri),
-                        }),
-                        {
-                          loading: 'Creating playlist...',
-                          success: (data) => {
-                            useStore.getState().setCurrentSong({
-                              title: data.body.name,
-                              uri: data.body.uri,
-                              image: data.body.images[0]?.url || '',
-                              artist: 'Mixmate',
-                            })
-
-                            const spotifyWebUrl = `https://open.spotify.com/playlist/${data.body.id}`
-                            window.open(spotifyWebUrl, '_blank')
-
-                            return 'Playlist created!'
-                          },
-                          error: 'Something went wrong',
-                        }
-                      )
-                    }}
-                    type="button"
-                    className="rounded-xl bg-indigo-600 px-2.5 py-1.5 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  >
-                    Create Playlist
-                  </button>
+                <div className="col-span-2 hidden items-center justify-end px-4 sm:flex">
+                  <CreatePlaylist></CreatePlaylist>
                 </div>
               </div>
             </div>
           </>
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center">
-            <a
+            <Link
               href="/api/spotify"
               className="flex w-full max-w-xs items-center space-x-2 p-4"
             >
               <SpotifyIcon className="h-24 w-24 text-green-500" />
               <p className="text-xl text-gray-200">Login with Spotify</p>
-            </a>
+            </Link>
           </div>
         )}
       </div>
@@ -260,7 +227,7 @@ export default function Home() {
   )
 }
 
-function SpotifyIcon(props: JSX.IntrinsicElements['svg']) {
+export function SpotifyIcon(props: JSX.IntrinsicElements['svg']) {
   return (
     <svg aria-hidden="true" viewBox="0 0 32 32" {...props}>
       <path

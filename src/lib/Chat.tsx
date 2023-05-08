@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast'
 import clsx from 'clsx'
 
 import { z } from 'zod'
+import { CreatePlaylist } from './CreatePlaylist'
 
 const updateSchema = z
   .object({
@@ -217,12 +218,14 @@ export const Chat = () => {
 
   const hasKey = useStore((state) => !!state.openAIKey)
 
+  const songs = useStore((state) => state.songs)
+
   if (!hasKey) return <></>
 
   return (
-    <div className="flex flex-1 flex-col pt-12">
-      <div className="relative flex h-full max-h-[55vh] w-full flex-col border-t border-slate-700/60">
-        <div className="flex h-full w-full flex-1 flex-col space-y-1 overflow-y-auto px-8 py-4 text-slate-300">
+    <div className="flex flex-1 flex-col pt-2 sm:pt-12">
+      <div className="relative flex h-full w-full flex-col border-t border-slate-700/60 sm:max-h-[55vh]">
+        <div className="flex h-full max-h-[20vh] w-full flex-1 flex-col space-y-1 overflow-y-auto px-8 py-4 text-slate-300 sm:max-h-full">
           {displayMessage.map((message, i) => {
             return (
               <div
@@ -239,28 +242,33 @@ export const Chat = () => {
             )
           })}
         </div>
-        <form
-          onSubmit={(e) => {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            toast.promise(onSubmit(e), {
-              error: (err) => {
-                console.error(err)
+        <div className="flex w-full place-items-end">
+          <form
+            onSubmit={(e) => {
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
+              toast.promise(onSubmit(e), {
+                error: (err) => {
+                  console.error(err)
 
-                return 'Error fetching data'
-              },
-              loading: 'Generating playlist ...',
-              success: 'Playlist generated!',
-            })
-          }}
-          className="place-items-end bg-slate-800 py-2"
-        >
-          <input
-            value={currentMessage}
-            onChange={(e) => setCurrentMessage(e.target.value)}
-            placeholder="Send a message"
-            className="h-full w-full resize-none border-transparent bg-transparent px-8 text-slate-300 outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 active:outline-none"
-          ></input>
-        </form>
+                  return 'Error fetching data'
+                },
+                loading: 'Generating playlist ...',
+                success: 'Playlist generated!',
+              })
+            }}
+            className="mx-2 w-full place-items-end rounded-2xl bg-slate-800 py-2.5 sm:rounded-none sm:px-0 sm:py-2"
+          >
+            <input
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              placeholder="Send a message"
+              className="h-full w-full resize-none border-transparent  bg-transparent px-8 text-slate-300 outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 active:outline-none"
+            ></input>
+          </form>
+          <div className="block sm:hidden">
+            {songs.length > 0 && <CreatePlaylist></CreatePlaylist>}
+          </div>
+        </div>
       </div>
     </div>
   )
