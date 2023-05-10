@@ -25,6 +25,7 @@ specifiers:
   eslint-config-next: ^13.2.4
   next: 13.3.4
   openai: ^3.2.1
+  openai-edge: ^0.5.1
   postcss: ^8.4.21
   postcss-focus-visible: ^8.0.2
   prettier: ^2.8.6
@@ -56,6 +57,7 @@ dependencies:
   clsx: 1.2.1
   next: 13.3.4_biqbaboplfbrettd7655fr4n2y
   openai: 3.2.1
+  openai-edge: 0.5.1
   postcss-focus-visible: 8.0.2_postcss@8.4.23
   react: 18.2.0
   react-device-detect: 2.2.3_biqbaboplfbrettd7655fr4n2y
@@ -2475,6 +2477,11 @@ packages:
       is-inside-container: 1.0.0
       is-wsl: 2.2.0
     dev: true
+
+  /openai-edge/0.5.1:
+    resolution: {integrity: sha512-/Q/b9wkPKWIzcnsp2o0Of5QW/t4A0XLw+E7rjVSYR3gLVt+pWpFuWCgWPWUVS1UrrLJPvzmndwe1JMpfqLRJIQ==}
+    engines: {node: '>=12'}
+    dev: false
 
   /openai/3.2.1:
     resolution: {integrity: sha512-762C9BNlJPbjjlWZi4WYK9iM2tAVAv0uUp1UmI34vb0CN5T2mjB/qM6RYBmNKMh/dN9fC+bxqPwWJZUTWW052A==}

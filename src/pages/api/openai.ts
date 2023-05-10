@@ -1,50 +1,44 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { type NextApiRequest, type NextApiResponse } from 'next'
-import axios from 'axios'
+import type { NextRequest } from 'next/server'
+import { Configuration, OpenAIApi } from 'openai-edge'
 import { env } from '~/env.mjs'
 import { requestSchema } from '~/utils/data'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Set up axios instance with the necessary configuration
+const configuration = new Configuration({
+  apiKey: env.OPENAI_KEY,
+})
+const openai = new OpenAIApi(configuration)
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  const props = requestSchema.parse(JSON.parse(req.body))
-
-  const openai = axios.create({
-    baseURL: 'https://api.openai.com/v1/',
-    headers: {
-      Authorization: `Bearer ${env.OPENAI_KEY}`,
-      'Content-Type': 'application/json',
-    },
-  })
+const handler = async (req: NextRequest) => {
+  const props = requestSchema.parse(await req.json())
 
   try {
-    // Start streaming the chat completion
-    const response = await openai({
-      method: 'POST',
-      url: '/chat/completions',
-      data: {
-        messages: props.messages,
-        model: props.model,
-        stream: true,
-      },
-      responseType: 'stream',
+    const completion = await openai.createChatCompletion({
+      ...props,
+      stream: true,
     })
 
-    // Set up response headers
-    res.setHeader('Content-Type', 'application/json')
-    res.setHeader('Transfer-Encoding', 'chunked')
-
-    // Pipe the response stream to the client
-    response.data.pipe(res)
+    return new Response(completion.body, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'text/event-stream;charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Accel-Buffering': 'no',
+      },
+    })
   } catch (error) {
-    if (error instanceof Error) {
-      console.error('Error streaming data:', error.message)
-      res.status(500).json({ error: 'Error streaming data from OpenAI API' })
-    }
+    console.error(error)
+
+    return new Response(JSON.stringify(error), {
+      status: 400,
+      headers: {
+        'content-type': 'application/json',
+      },
+    })
   }
+}
+
+export const config = {
+  runtime: 'edge',
 }
 
 export default handler
