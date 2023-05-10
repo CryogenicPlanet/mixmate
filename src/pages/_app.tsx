@@ -13,12 +13,16 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         title="Mixmate"
         description="Mixmate is a tool to help you create spotify playlists with chatgpt."
         openGraph={{
+          url: 'https://mixmate.lol',
           images: [
             {
-              url: '/og.png',
+              url: 'https://mixmate.lol/og.png',
               alt: 'Mixmate',
             },
           ],
+        }}
+        twitter={{
+          cardType: 'summary_large_image',
         }}
         additionalLinkTags={[
           {
