@@ -87,17 +87,13 @@ export const Chat = () => {
 
       const checkBuffer = (str: string) => {
         try {
-          if (str.includes('\n')) {
-            const splits = str.split('}\n')
+          str = str.replaceAll('\n', '')
+          str = str.replaceAll('{', '')
+          str = str.replaceAll('}', '')
 
-            for (const split of splits) {
-              checkBuffer(split)
-            }
+          str = `{${str}}`
 
-            checkBuffer(str.replaceAll('\n', ''))
-
-            return
-          }
+          console.log({ checkBuffer: str })
 
           const lineJson = JSON.parse(str) as {
             key: string
@@ -216,135 +212,6 @@ export const Chat = () => {
         reject(error)
       }
     })
-
-    // await new Promise<void>((resolve) => {
-    //   openai.createChatCompletion(
-    //     {
-    //       messages: newMessages,
-    //       model: 'gpt-3.5-turbo',
-    //       stream: true,
-    //     },
-    //     {
-    //       onDownloadProgress(event: ProgressEvent) {
-    //         const target = event.target as XMLHttpRequest
-    //         const newUpdates = target.responseText
-    //           .replace('data: [DONE]', '')
-    //           .trim()
-    //           .split('data: ')
-    //           .filter(Boolean)
-
-    //         const checkBuffer = (str: string) => {
-    //           console.log('checkBuffer', {
-    //             str,
-    //           })
-
-    //           try {
-    //             if (str.includes('\n')) {
-    //               const splits = str.split('\n')
-
-    //               for (const split of splits) {
-    //                 checkBuffer(split)
-    //               }
-
-    //               return
-    //             }
-
-    //             const lineJson = JSON.parse(str) as {
-    //               key: string
-    //               value: string
-    //             }
-
-    //             if (lineJson.key === 'messageToUser') {
-    //               messageToUser = lineJson.value
-
-    //               setDisplayMessage([
-    //                 ...displayMessageClone,
-    //                 {
-    //                   role: 'assistant',
-    //                   content: messageToUser,
-    //                 },
-    //               ])
-
-    //               strBuffer = ''
-    //             } else if (lineJson.key === 'song') {
-    //               const song = lineJson.value
-
-    //               useStore.getState().addSongName(song)
-
-    //               searchTracks(song).then((track) => {
-    //                 if (!track) return
-    //                 useStore.getState().addSong(track)
-    //               })
-
-    //               songs.push(song)
-
-    //               setDisplayMessage([
-    //                 ...displayMessageClone,
-    //                 {
-    //                   role: 'assistant',
-    //                   content: `${messageToUser}\n${songs.join(', \n')}`,
-    //                 },
-    //               ])
-
-    //               strBuffer = ''
-    //             } else if (lineJson.key === 'playlistName') {
-    //               playlistName = lineJson.value
-
-    //               strBuffer = ''
-    //             }
-    //           } catch (e) {
-    //             console.warn('Error parsing JSON', e)
-    //             // console.log(e)
-    //           }
-    //         }
-
-    //         // Resolve when the last update is received
-    //         if (newUpdates[newUpdates.length - 1]?.includes('[DONE]')) {
-    //           checkBuffer(strBuffer)
-    //           resolve()
-    //         }
-
-    //         if (newUpdates.length > updateId) {
-    //           for (let i = updateId; i < newUpdates.length; i++) {
-    //             const update = newUpdates[i]
-
-    //             console.log({ update })
-
-    //             if (!update) continue
-
-    //             const json = updateSchema.parse(JSON.parse(update))
-
-    //             if (json.choices?.[0]?.finish_reason === 'stop') {
-    //               checkBuffer(strBuffer)
-    //               resolve()
-    //             }
-
-    //             const delta = json.choices?.[0]?.delta
-
-    //             if (!delta) continue
-
-    //             if (delta.content) {
-    //               strBuffer += delta.content
-    //               fullMessage += delta.content
-
-    //               console.log({ strBuffer, messageToUser, songs })
-
-    //               if (strBuffer.includes('\n')) {
-    //                 const splits = strBuffer.split('\n')
-
-    //                 for (const split of splits) {
-    //                   checkBuffer(split)
-    //                 }
-    //               }
-    //             }
-    //           }
-
-    //           updateId = newUpdates.length
-    //         }
-    //       },
-    //     }
-    //   )
-    // })
 
     setMessages([...messages, { role: 'assistant', content: fullMessage }])
 
