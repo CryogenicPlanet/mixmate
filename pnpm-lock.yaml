@@ -25,6 +25,7 @@ specifiers:
   eslint: ^8.36.0
   eslint-config-next: ^13.2.4
   next: 13.3.4
+  next-seo: ^6.0.0
   openai: ^3.2.1
   openai-edge: ^0.5.1
   postcss: ^8.4.21
@@ -58,6 +59,7 @@ dependencies:
   clsx: 1.2.1
   endent: 2.1.0
   next: 13.3.4_biqbaboplfbrettd7655fr4n2y
+  next-seo: 6.0.0_vwuoxxmoeydgew5hhkavebkk4e
   openai: 3.2.1
   openai-edge: 0.5.1
   postcss-focus-visible: 8.0.2_postcss@8.4.23
@@ -2327,6 +2329,18 @@ packages:
   /natural-compare/1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
+
+  /next-seo/6.0.0_vwuoxxmoeydgew5hhkavebkk4e:
+    resolution: {integrity: sha512-jKKt1p1z4otMA28AyeoAONixVjdYmgFCWwpEFtu+DwRHQDllVX3RjtyXbuCQiUZEfQ9rFPBpAI90vDeLZlMBdg==}
+    peerDependencies:
+      next: ^8.1.1-canary.54 || >=9.0.0
+      react: '>=16.0.0'
+      react-dom: '>=16.0.0'
+    dependencies:
+      next: 13.3.4_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
 
   /next/13.3.4_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-sod7HeokBSvH5QV0KB+pXeLfcXUlLrGnVUXxHpmhilQ+nQYT3Im2O8DswD5e4uqbR8Pvdu9pcWgb1CbXZQZlmQ==}

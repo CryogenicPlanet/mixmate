@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import Head from 'next/head'
 import { Layout } from '~/lib/Layout'
 import {
   type Song,
@@ -170,13 +169,6 @@ export default function Home() {
 
   return (
     <Layout>
-      <Head>
-        <title>Mixmate</title>
-        <meta
-          name="description"
-          content="Mixmate is a tool to help you create playlists with chatgpt."
-        />
-      </Head>
       <div className="h-full pt-1 sm:pt-18">
         {hasSpotifyAccess ? (
           <>

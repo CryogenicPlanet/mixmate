@@ -22,6 +22,7 @@
     "clsx": "^1.2.1",
     "endent": "^2.1.0",
     "next": "13.3.4",
+    "next-seo": "^6.0.0",
     "openai": "^3.2.1",
     "openai-edge": "^0.5.1",
     "postcss-focus-visible": "^8.0.2",
