@@ -14,12 +14,11 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import { useRouter } from 'next/router'
 
-import SpotifyPlayer from 'react-spotify-web-playback'
-import colors from 'tailwindcss/colors'
 import { CreatePlaylist } from '~/lib/CreatePlaylist'
 
 import { isMobile } from 'react-device-detect'
 import Mobile from './mobile'
+import { SpotifyPlayerWrapper } from '~/lib/SpotifyPlayer'
 
 function PlayPauseIcon({
   playing,
@@ -199,24 +198,7 @@ export default function Home() {
               </div>
               <div className="hidden w-full grid-cols-12 sm:grid">
                 <div className="col-span-10">
-                  {currentSong && (
-                    <SpotifyPlayer
-                      token={useStore.getState().spotifyToken.access}
-                      uris={[currentSong.uri]}
-                      initialVolume={0.5}
-                      callback={(state) => console.log(state)}
-                      styles={{
-                        activeColor: '#fff',
-                        bgColor: colors.slate[900],
-                        color: '#fff',
-                        loaderColor: '#fff',
-                        sliderColor: '#1cb954',
-                        trackArtistColor: '#ccc',
-                        trackNameColor: '#fff',
-                        sliderHandleColor: colors.green[500],
-                      }}
-                    />
-                  )}
+                  {currentSong && <SpotifyPlayerWrapper></SpotifyPlayerWrapper>}
                 </div>
                 <div className="col-span-2 hidden items-center justify-end px-4 sm:flex">
                   <CreatePlaylist></CreatePlaylist>
