@@ -12,6 +12,7 @@ import clsx from 'clsx'
 import { type z } from 'zod'
 import { CreatePlaylist } from './CreatePlaylist'
 import { requestSchema, updateSchema } from '~/utils/data'
+import endent from 'endent'
 
 const parseSafe = (json: string) => {
   try {
@@ -27,7 +28,8 @@ export const Chat = () => {
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([
     {
       role: 'system',
-      content: `You are a model that generates playlist for users based on their requests
+      content: endent`
+      You are a model that generates playlist for users based on their requests
       ONLY reply in the following format in ndjson (follow the JSON spec properly):
       {"key": "messageToUser", "value": string}
       {"key": "playlistName", "value": string}
