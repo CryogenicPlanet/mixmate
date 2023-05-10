@@ -1,4 +1,4 @@
-import { Fragment, useId } from 'react'
+import { useId } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -77,8 +77,6 @@ function Waveform(props: JSX.IntrinsicElements['svg']) {
 }
 
 export function Layout({ children }: React.PropsWithChildren) {
-  const hosts = ['Scalar']
-
   const currentSong = useStore((state) => state.currentSong)
 
   const songs = useStore((state) => state.songs)
@@ -86,22 +84,7 @@ export function Layout({ children }: React.PropsWithChildren) {
   return (
     <div className="flex h-full max-h-screen min-h-screen grid-cols-12 flex-col overflow-hidden bg-slate-900 sm:grid">
       <div className="col-span-3 grid flex-1 grid-cols-12 bg-slate-900">
-        <div className="col-span-1 hidden sm:block lg:sticky lg:top-0 lg:flex lg:w-16 lg:flex-none lg:items-center lg:whitespace-nowrap lg:py-12 lg:text-sm lg:leading-7 lg:[writing-mode:vertical-rl]">
-          <span className="font-mono text-slate-500">Build by</span>
-          <span className="mt-6 flex gap-6 font-bold text-slate-300">
-            {hosts.map((host, hostIndex) => (
-              <Fragment key={host}>
-                {hostIndex !== 0 && (
-                  <span aria-hidden="true" className="text-slate-400">
-                    /
-                  </span>
-                )}
-                {host}
-              </Fragment>
-            ))}
-          </span>
-        </div>
-        <div className="relative z-10 col-span-12 mx-auto flex h-full max-h-screen w-full flex-col pt-10 sm:col-span-11 sm:max-w-2xl lg:min-h-full lg:flex-auto lg:border-x lg:border-slate-800/70 lg:pt-12">
+        <div className="relative z-10 col-span-12 mx-auto flex h-full max-h-screen w-full flex-col pt-10 sm:max-w-2xl lg:min-h-full lg:flex-auto lg:border-x lg:border-slate-800/70 lg:pt-12">
           <div className="flex w-full flex-col">
             <div className="px-12">
               <Link
@@ -123,11 +106,15 @@ export function Layout({ children }: React.PropsWithChildren) {
               <p className="text-xl font-bold text-slate-300">
                 <Link href="/">Mixmate</Link>
               </p>
-              {!currentSong && (
-                <p className="mt-3 text-lg font-medium leading-8 text-slate-400">
-                  Talk to GPT and get a mixtape back
-                </p>
-              )}
+
+              <p
+                className={clsx(
+                  'mt-3 text-lg font-medium leading-8 text-slate-400',
+                  currentSong ? 'hidden sm:block' : ''
+                )}
+              >
+                Talk to GPT and get a mixtape back
+              </p>
             </div>
             <div className="flex max-h-[15vh] overflow-y-scroll sm:hidden">
               {currentSong && (
@@ -166,7 +153,7 @@ export function Layout({ children }: React.PropsWithChildren) {
         </div>
       </div>
       <main className="relative col-span-9 hidden h-full flex-col sm:flex">
-        <Waveform className="absolute left-0 top-0 hidden h-20 w-full -translate-x-3 sm:block" />
+        <Waveform className="absolute left-0 top-0 hidden h-20 w-full sm:block" />
         <div className="relative h-full">{children}</div>
       </main>
     </div>

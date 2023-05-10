@@ -12,6 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   url.searchParams.append('spotifyToken', data.body.access_token)
   url.searchParams.append('spotifyRefreshToken', data.body.refresh_token)
+  url.searchParams.append('spotifyExpiresIn', data.body.expires_in.toString())
 
   res.redirect(url.toString())
 }

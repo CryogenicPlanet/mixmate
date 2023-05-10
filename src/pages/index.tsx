@@ -2,12 +2,12 @@ import { useEffect } from 'react'
 import Head from 'next/head'
 import { Layout } from '~/lib/Layout'
 import {
-  OPENAI_LOCAL_STORAGE_KEY,
   type Song,
   useStore,
   getSongInfo,
   SPOTIFY_ACCESS_TOKEN_LOCAL_STORAGE_KEY,
   SPOTIFY_REFRESH_TOKEN_LOCAL_STORAGE_KEY,
+  SPOTIFY_EXPIRES_AT_LOCAL_STORAGE_KEY,
 } from '~/lib/state'
 import Link from 'next/link'
 
@@ -16,8 +16,10 @@ import { useRouter } from 'next/router'
 
 import SpotifyPlayer from 'react-spotify-web-playback'
 import colors from 'tailwindcss/colors'
-import { env } from '~/env.mjs'
 import { CreatePlaylist } from '~/lib/CreatePlaylist'
+
+import { isMobile } from 'react-device-detect'
+import Mobile from './mobile'
 
 function PlayPauseIcon({
   playing,
@@ -38,13 +40,13 @@ function PlayPauseIcon({
   )
 }
 
-function SongElement({ song }: { song: Song }) {
+export function SongElement({ song }: { song: Song }) {
   return (
     <div className="py-4">
       <div className={clsx('lg:px-8')}>
         <div className="lg:max-w-4xl">
           <div className="mx-auto px-2 sm:px-2 md:max-w-2xl md:px-2 lg:px-0">
-            <div className="flex flex-col items-center space-x-2 sm:flex-row">
+            <div className="flex flex-col items-center sm:flex-row sm:space-x-2">
               <div className="flex flex-col items-center justify-center sm:flex-row">
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -96,7 +98,6 @@ export default function Home() {
 
   // useEffect: Get the openai key from local storage
   useEffect(() => {
-    const openAIKey = window.localStorage.getItem(OPENAI_LOCAL_STORAGE_KEY)
     const spotifyAccessToken = window.localStorage.getItem(
       SPOTIFY_ACCESS_TOKEN_LOCAL_STORAGE_KEY
     )
@@ -104,16 +105,15 @@ export default function Home() {
       SPOTIFY_REFRESH_TOKEN_LOCAL_STORAGE_KEY
     )
 
-    if (openAIKey) {
-      useStore.getState().setOpenAIKey(openAIKey)
-    } else {
-      useStore.getState().setOpenAIKey(env.NEXT_PUBLIC_DANGEROUS_OPENAI_API_KEY)
-    }
+    const spotifyExpiresAt = window.localStorage.getItem(
+      SPOTIFY_EXPIRES_AT_LOCAL_STORAGE_KEY
+    )
 
-    if (spotifyAccessToken && spotifyRefreshToken) {
+    if (spotifyAccessToken && spotifyRefreshToken && spotifyExpiresAt) {
       useStore.getState().setSpotifyToken({
         access: spotifyAccessToken,
         refresh: spotifyRefreshToken,
+        expires_at: spotifyExpiresAt,
       })
     }
 
@@ -125,24 +125,33 @@ export default function Home() {
     window.state = useStore
   }, [])
 
-  const { spotifyRefreshToken, spotifyToken } = router.query
+  const { spotifyRefreshToken, spotifyToken, spotifyExpiresIn } = router.query
 
   useEffect(() => {
-    if (!spotifyRefreshToken || !spotifyToken) return
+    if (!spotifyRefreshToken || !spotifyToken || !spotifyExpiresIn) return
 
     window.localStorage.setItem(
       SPOTIFY_ACCESS_TOKEN_LOCAL_STORAGE_KEY,
       spotifyToken as string
     )
 
+    const newDate = new Date()
+    newDate.setSeconds(newDate.getSeconds() + Number(spotifyExpiresIn))
+
     window.localStorage.setItem(
       SPOTIFY_REFRESH_TOKEN_LOCAL_STORAGE_KEY,
       spotifyRefreshToken as string
     )
 
+    window.localStorage.setItem(
+      SPOTIFY_EXPIRES_AT_LOCAL_STORAGE_KEY,
+      newDate.toISOString()
+    )
+
     useStore.getState().setSpotifyToken({
       access: spotifyToken as string,
       refresh: spotifyRefreshToken as string,
+      expires_at: newDate.toISOString(),
     })
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -155,6 +164,10 @@ export default function Home() {
   const songs = useStore((state) => state.songs)
 
   const currentSong = useStore((state) => state.currentSong)
+
+  if (isMobile) {
+    return <Mobile></Mobile>
+  }
 
   return (
     <Layout>

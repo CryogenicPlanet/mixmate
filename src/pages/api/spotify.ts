@@ -2,7 +2,7 @@ import { type NextApiRequest, type NextApiResponse } from 'next'
 import SpotifyWebApi from 'spotify-web-api-node'
 import { env } from '~/env.mjs'
 
-export const baseUrl = `https://mixmate.lol`
+export const baseUrl = `http://100.72.180.26:3000`
 
 export const REDIRECT_URI = `${baseUrl}/api/callback`
 

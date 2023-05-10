@@ -31,9 +31,12 @@ export const spotifyRouter = createTRPCRouter({
 
       console.log({ input })
 
-      const playlist = await spotify.createPlaylist(input.name, {
-        description: 'Created by Mixmate',
-      })
+      const playlist = await spotify.createPlaylist(
+        input.name || `Mixmate Playlist ${new Date().toISOString()}`,
+        {
+          description: 'Created by Mixmate',
+        }
+      )
 
       await spotify.addTracksToPlaylist(playlist.body.id, input.songs)
 

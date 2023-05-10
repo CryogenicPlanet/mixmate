@@ -3,11 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { create } from 'zustand'
 
-import { Configuration, OpenAIApi } from 'openai'
-
 import SpotifyWebApi from 'spotify-web-api-js'
 import { apiClient } from '~/utils/api'
-import { env } from '~/env.mjs'
 
 const spotifyApi = new SpotifyWebApi()
 
@@ -43,10 +40,14 @@ export const searchTracks = async (query: string): Promise<Song | null> => {
           refresh: useStore.getState().spotifyToken.refresh,
         })
 
+        const newDate = new Date()
+        newDate.setSeconds(newDate.getSeconds() + data.body.expires_in)
+
         useStore.getState().setSpotifyToken({
           access: data.body.access_token,
           refresh:
             data.body.refresh_token || useStore.getState().spotifyToken.refresh,
+          expires_at: newDate.toISOString(),
         })
 
         return searchTracks(query)
@@ -85,18 +86,21 @@ export const getSongInfo = async () => {
 export const OPENAI_LOCAL_STORAGE_KEY = 'openai-key'
 export const SPOTIFY_ACCESS_TOKEN_LOCAL_STORAGE_KEY = 'spotify-access-token'
 export const SPOTIFY_REFRESH_TOKEN_LOCAL_STORAGE_KEY = 'spotify-refresh-token'
+export const SPOTIFY_EXPIRES_AT_LOCAL_STORAGE_KEY = 'spotify-expires-at'
 
 type Store = {
-  openAIKey: string
   spotifyToken: {
     access: string
     refresh: string
+    expires_at: string
   }
   playlistName: string
   setPlaylistName: (name: string) => void
-  setSpotifyToken: (token: { access: string; refresh: string }) => void
-  openAI: OpenAIApi | null
-  setOpenAIKey: (key: string) => void
+  setSpotifyToken: (token: {
+    access: string
+    refresh: string
+    expires_at: string
+  }) => void
   songNames: string[]
   songs: Song[]
   setSongNames: (songNames: string[]) => void
@@ -112,28 +116,26 @@ export const useStore = create<Store>((set) => ({
   spotifyToken: {
     access: '',
     refresh: '',
+    expires_at: '',
   },
   playlistName: '',
   setPlaylistName: (name: string) => {
     set({ playlistName: name })
   },
-  setSpotifyToken: (token: { access: string; refresh: string }) => {
+  setSpotifyToken: (token: {
+    access: string
+    refresh: string
+    expires_at: string
+  }) => {
     set({ spotifyToken: token })
   },
   addSongName: (songName: string) => {
     set({ songNames: [...useStore.getState().songNames, songName] })
   },
   addSong: (song: Song) => {
-    set({ songs: [...useStore.getState().songs, song] })
-  },
-  openAI: null,
-  setOpenAIKey: (key: string) => {
-    const configuration = new Configuration({
-      apiKey: key,
-    })
-    const openai = new OpenAIApi(configuration)
+    if (useStore.getState().songs.find((s) => s.title === song.title)) return
 
-    set({ openAIKey: key, openAI: openai })
+    set({ songs: [...useStore.getState().songs, song] })
   },
   songs: [],
   songNames: [],
