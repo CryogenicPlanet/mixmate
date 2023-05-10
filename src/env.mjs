@@ -11,6 +11,7 @@ export const env = createEnv({
     SPOTIFY_CLIENT_ID: z.string().min(1),
     SPOTIFY_CLIENT_SECRET: z.string().min(1),
     OPENAI_KEY: z.string().min(1),
+    URL: z.string().min(1).default("https://mixmate.vercel.app")
   },
 
   /**
@@ -33,6 +34,7 @@ export const env = createEnv({
     OPENAI_KEY: process.env.OPENAI_API_KEY,
     SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
     NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+    URL: process.env.URL
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
 });
