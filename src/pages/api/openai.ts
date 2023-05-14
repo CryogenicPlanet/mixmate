@@ -4,7 +4,13 @@ import { env } from '~/env.mjs'
 import { requestSchema } from '~/utils/data'
 
 const configuration = new Configuration({
+  basePath: `"https://oai.hconeai.com/v1"`,
   apiKey: env.OPENAI_KEY,
+  baseOptions: {
+    headers: {
+      'Helicone-Auth': `Bearer ${env.HELICONE_KEY}`,
+    },
+  },
 })
 const openai = new OpenAIApi(configuration)
 
