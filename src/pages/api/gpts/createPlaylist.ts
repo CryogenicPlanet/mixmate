@@ -26,31 +26,43 @@ export const createPlaylistResponseSchema = zpp(
 )
 
 const handler: NextApiHandler = async (req, res) => {
-  const input = createPlaylistSchema.jsonParse(req.body)
+  try {
+    const input = createPlaylistSchema.jsonParseSafe(req.body)
 
-  const spotify = getSpotify()
-
-  spotify.setAccessToken(env.SPOTIFY_MIXMATE_ACCESS_TOKEN)
-  spotify.setRefreshToken(env.SPOTIFY_MIXMATE_REFRESH_TOKEN)
-
-  const playlist = await spotify.createPlaylist(
-    input.name || `Mixmate Playlist ${new Date().toISOString()}`,
-    {
-      description: 'Created by Mixmate (https://chatg.pt/spotify)',
+    if (!input.success) {
+      res.status(400).json({ error: 'Data did not pass schema validation' })
+      return
     }
-  )
 
-  await spotify.addTracksToPlaylist(
-    playlist.body.id,
-    input.songs.map((s) => s.uri)
-  )
+    const { data } = input
 
-  res.status(200).json(
-    createPlaylistResponseSchema.new({
-      playlistId: playlist.body.id,
-      playlistUrl: playlist.body.external_urls.spotify,
-    })
-  )
+    const spotify = getSpotify()
+
+    spotify.setAccessToken(env.SPOTIFY_MIXMATE_ACCESS_TOKEN)
+    spotify.setRefreshToken(env.SPOTIFY_MIXMATE_REFRESH_TOKEN)
+
+    const playlist = await spotify.createPlaylist(
+      data.name || `Mixmate Playlist ${new Date().toISOString()}`,
+      {
+        description: 'Created by Mixmate (https://chatg.pt/spotify)',
+      }
+    )
+
+    await spotify.addTracksToPlaylist(
+      playlist.body.id,
+      data.songs.map((s) => s.uri)
+    )
+
+    res.status(200).json(
+      createPlaylistResponseSchema.new({
+        playlistId: playlist.body.id,
+        playlistUrl: playlist.body.external_urls.spotify,
+      })
+    )
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: e })
+  }
 }
 
 export default handler
