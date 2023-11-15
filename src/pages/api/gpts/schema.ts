@@ -14,13 +14,20 @@ const handler: NextApiHandler = async (req, res) => {
   const registry = new OpenAPIRegistry()
 
   registry.registerPath({
-    method: 'get',
+    method: 'post',
     path: '/api/gpts/getSongs',
     operationId: 'GetSpotifySongsDetails',
     'x-openai-isConsequential': false,
-    description: 'Get songs details from spotify using queries',
+    description:
+      'Get songs details from spotify using queries of song titles/artists, required for creating a playlist',
     request: {
-      query: getSongReqSchema,
+      body: {
+        content: {
+          'application/json': {
+            schema: getSongReqSchema,
+          },
+        },
+      },
     },
     responses: {
       200: {
@@ -43,7 +50,8 @@ const handler: NextApiHandler = async (req, res) => {
     operationId: 'CreatePlaylist',
     path: '/api/gpts/createPlaylist',
     'x-openai-isConsequential': false,
-    description: 'Create a playlist on spotify',
+    description:
+      'Create a playlist from spotify song uris, get uris from GetSpotifySongsDetails',
     request: {
       body: {
         content: {

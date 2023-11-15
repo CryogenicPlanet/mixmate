@@ -15,7 +15,6 @@ export const createPlaylistSchema = zpp(
         })
       )
       .describe("The playlist's songs"),
-    operationId: z.string(),
   })
 )
 
