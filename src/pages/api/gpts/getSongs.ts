@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { Song } from '~/lib/state'
 import { zpp } from '@cryop/zpp'
 import { getSpotify } from '../spotify'
+import { env } from '~/env.mjs'
 
 export const getSongReqSchema = zpp(
   z.object({
@@ -34,6 +35,9 @@ const handler: NextApiHandler = async (req, res) => {
   const spotify = getSpotify()
 
   const input = getSongReqSchema.jsonParse(req.query)
+
+  spotify.setAccessToken(env.SPOTIFY_MIXMATE_ACCESS_TOKEN)
+  spotify.setRefreshToken(env.SPOTIFY_MIXMATE_REFRESH_TOKEN)
 
   const songs = await Promise.all(
     input.queries.map(async (query) => {
