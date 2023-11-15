@@ -19,7 +19,7 @@ const handler: NextApiHandler = async (req, res) => {
     operationId: 'GetSpotifySongsDetails',
     'x-openai-isConsequential': false,
     description:
-      'Get songs details from spotify using queries of song titles/artists, required for creating a playlist',
+      'Get songs details from spotify using queries of song titles, required for creating a playlist',
     request: {
       body: {
         content: {

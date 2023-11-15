@@ -10,7 +10,7 @@ export const getSongReqSchema = zpp(
     queries: z
       .array(z.string())
       .describe(
-        'Search queries of song names/artists to get songs from spotify'
+        'Search queries of song titles (can use song title + artist if many songs have same name) to get songs from spotify'
       ),
   })
 )
