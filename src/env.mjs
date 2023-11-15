@@ -12,7 +12,9 @@ export const env = createEnv({
     SPOTIFY_CLIENT_SECRET: z.string().min(1),
     OPENAI_KEY: z.string().min(1),
     HELICONE_KEY: z.string().min(1),
-    URL: z.string().min(1).default("https://mixmate.vercel.app")
+    URL: z.string().min(1).default("https://mixmate.vercel.app"),
+    SPOTIFY_MIXMATE_ACCESS_TOKEN: z.string().min(1),
+    SPOTIFY_MIXMATE_REFRESH_TOKEN: z.string().min(1),
   },
 
   /**
@@ -36,7 +38,9 @@ export const env = createEnv({
     SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
     NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
     HELICONE_KEY: process.env.HELICONE_KEY,
-    URL: process.env.URL
+    URL: process.env.URL,
+    SPOTIFY_MIXMATE_ACCESS_TOKEN: process.env.SPOTIFY_MIXMATE_ACCESS_TOKEN,
+    SPOTIFY_MIXMATE_REFRESH_TOKEN: process.env.SPOTIFY_MIXMATE_REFRESH_TOKEN,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
 });

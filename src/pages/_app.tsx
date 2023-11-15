@@ -5,6 +5,10 @@ import { Toaster } from 'react-hot-toast'
 import { DefaultSeo } from 'next-seo'
 
 import '~/styles/globals.css'
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
+import { z } from 'zod'
+
+extendZodWithOpenApi(z)
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (

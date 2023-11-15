@@ -34,7 +34,7 @@ export const spotifyRouter = createTRPCRouter({
       const playlist = await spotify.createPlaylist(
         input.name || `Mixmate Playlist ${new Date().toISOString()}`,
         {
-          description: 'Created by Mixmate',
+          description: 'Created by Mixmate (https://chatgp.t/spotify)',
         }
       )
 
