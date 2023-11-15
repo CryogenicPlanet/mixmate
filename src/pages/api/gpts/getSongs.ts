@@ -2,7 +2,7 @@ import { type NextApiHandler } from 'next'
 import { z } from 'zod'
 import { Song } from '~/lib/state'
 import { zpp } from '@cryop/zpp'
-import { getSpotify } from '../spotify'
+import { getMixmateSpotify } from '../spotify'
 import { env } from '~/env.mjs'
 
 export const getSongReqSchema = zpp(
@@ -32,8 +32,6 @@ export const getSongResponseSchema = zpp(
 
 const handler: NextApiHandler = async (req, res) => {
   try {
-    const spotify = getSpotify()
-
     const input = getSongReqSchema.jsonParseSafe(req.body)
 
     if (!input.success) {
@@ -41,10 +39,7 @@ const handler: NextApiHandler = async (req, res) => {
       return
     }
 
-    console.log({ input })
-
-    spotify.setAccessToken(env.SPOTIFY_MIXMATE_ACCESS_TOKEN)
-    spotify.setRefreshToken(env.SPOTIFY_MIXMATE_REFRESH_TOKEN)
+    const spotify = await getMixmateSpotify()
 
     const songs = await Promise.all(
       input.data.queries.map(async (query) => {

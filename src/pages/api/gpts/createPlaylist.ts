@@ -1,7 +1,7 @@
 import { zpp } from '@cryop/zpp'
 import { type NextApiHandler } from 'next'
 import { z } from 'zod'
-import { getSpotify } from '../spotify'
+import { getMixmateSpotify } from '../spotify'
 import { env } from '~/env.mjs'
 
 export const createPlaylistSchema = zpp(
@@ -36,10 +36,7 @@ const handler: NextApiHandler = async (req, res) => {
 
     const { data } = input
 
-    const spotify = getSpotify()
-
-    spotify.setAccessToken(env.SPOTIFY_MIXMATE_ACCESS_TOKEN)
-    spotify.setRefreshToken(env.SPOTIFY_MIXMATE_REFRESH_TOKEN)
+    const spotify = await getMixmateSpotify()
 
     const playlist = await spotify.createPlaylist(
       data.name || `Mixmate Playlist ${new Date().toISOString()}`,
