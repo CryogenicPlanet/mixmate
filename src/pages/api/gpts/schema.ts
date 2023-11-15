@@ -16,7 +16,7 @@ const handler: NextApiHandler = async (req, res) => {
   registry.registerPath({
     method: 'get',
     path: '/api/gpts/getSongs',
-    operationId: 'GetSongsDetails',
+    operationId: 'GetSpotifySongsDetails',
     'x-openai-isConsequential': false,
     description: 'Get songs details from spotify using queries',
     request: {

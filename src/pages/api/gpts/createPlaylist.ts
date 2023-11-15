@@ -26,7 +26,7 @@ export const createPlaylistResponseSchema = zpp(
   })
 )
 
-export const handler: NextApiHandler = async (req, res) => {
+const handler: NextApiHandler = async (req, res) => {
   const input = createPlaylistSchema.jsonParse(req.body)
 
   const spotify = getSpotify()
@@ -53,3 +53,5 @@ export const handler: NextApiHandler = async (req, res) => {
     })
   )
 }
+
+export default handler

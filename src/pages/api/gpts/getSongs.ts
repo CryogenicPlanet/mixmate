@@ -7,8 +7,10 @@ import { getSpotify } from '../spotify'
 export const getSongReqSchema = zpp(
   z.object({
     queries: z
-      .array(z.string().openapi({ example: 'marron 5 sugar' }))
-      .describe('Search queries to get songs from spotify'),
+      .array(z.string())
+      .describe(
+        'Search queries of song names/artists to get songs from spotify'
+      ),
     operationId: z.string(),
   })
 )
@@ -28,7 +30,7 @@ export const getSongResponseSchema = zpp(
   })
 )
 
-export const handler: NextApiHandler = async (req, res) => {
+const handler: NextApiHandler = async (req, res) => {
   const spotify = getSpotify()
 
   const input = getSongReqSchema.jsonParse(req.query)
@@ -47,3 +49,5 @@ export const handler: NextApiHandler = async (req, res) => {
 
   res.status(200).json(getSongResponseSchema.parse({ songs }))
 }
+
+export default handler
