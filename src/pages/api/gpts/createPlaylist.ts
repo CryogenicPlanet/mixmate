@@ -53,7 +53,7 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(200).json(
       createPlaylistResponseSchema.new({
         playlistId: playlist.body.id,
-        playlistUrl: playlist.body.external_urls.spotify,
+        playlistUrl: `https://open.spotify.com/playlist/${playlist.body.id}`,
       })
     )
   } catch (e) {
